@@ -15,7 +15,7 @@ object SensorModule {
 
     @Provides
     @Singleton
-    fun provideLightSensor(app: Application): MeasurableSensor {
+    fun provideAccelerometerSensor(app: Application): MeasurableSensor {
         return AccelerometerSensor(app)
     }
 

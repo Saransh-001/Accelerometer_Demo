@@ -44,6 +44,7 @@ fun Ball(
     val newY = (ballPosition.value.y + dy).coerceIn(0f, maxY)
 
     ballPosition.value = Offset(newX, newY)
+
     Box(
         modifier = Modifier
             .fillMaxSize()

@@ -10,22 +10,22 @@ import jakarta.inject.Inject
 
 @HiltViewModel
 class SensorViewModel @Inject constructor(
-    private val lightSensor: MeasurableSensor
+    private val accelerometerSensor: MeasurableSensor
 ): ViewModel() {
 
     var x by mutableFloatStateOf(0f)
     var y by mutableFloatStateOf(0f)
 
     fun startListening() {
-        lightSensor.startListening()
-        lightSensor.setOnSensorValuesChangedListener { values ->
+        accelerometerSensor.startListening()
+        accelerometerSensor.setOnSensorValuesChangedListener { values ->
             x = values[0]
             y = values[1]
         }
     }
 
     fun stopListening() {
-        lightSensor.stopListening()
+        accelerometerSensor.stopListening()
     }
 
 }
