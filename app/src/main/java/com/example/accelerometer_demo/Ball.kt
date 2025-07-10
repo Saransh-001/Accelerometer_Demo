@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -28,8 +30,9 @@ fun Ball(
     viewModel: SensorViewModel
 ) {
     val ballRadius = 125f
-    val screenSize = remember { mutableStateOf(Size.Zero) }
-    val ballPosition = remember { mutableStateOf(Offset.Zero) }
+    var screenSize by remember { mutableStateOf(Size.Zero) }
+    var ballPosition by remember { mutableStateOf(Offset.Zero) }
+    var isStopped by remember { mutableStateOf(false) }
 
     val x = viewModel.x
     val y = viewModel.y
@@ -37,13 +40,14 @@ fun Ball(
     val dx = -x * 5
     val dy = y * 5
 
-    val maxX = maxOf(0f, screenSize.value.width - ballRadius * 2)
-    val maxY = maxOf(0f, screenSize.value.height - ballRadius * 2)
+    val maxX = maxOf(0f, screenSize.width - ballRadius * 2)
+    val maxY = maxOf(0f, screenSize.height - ballRadius * 2)
 
-    val newX = (ballPosition.value.x + dx).coerceIn(0f, maxX)
-    val newY = (ballPosition.value.y + dy).coerceIn(0f, maxY)
-
-    ballPosition.value = Offset(newX, newY)
+    if (!isStopped) {
+        val newX = (ballPosition.x + dx).coerceIn(0f, maxX)
+        val newY = (ballPosition.y + dy).coerceIn(0f, maxY)
+        ballPosition = Offset(newX, newY)
+    }
 
     Box(
         modifier = Modifier
@@ -51,10 +55,10 @@ fun Ball(
             .background(Color.Black)
             .onGloballyPositioned {
                 val size = it.size
-                screenSize.value = Size(size.width.toFloat(), size.height.toFloat())
+                screenSize = Size(size.width.toFloat(), size.height.toFloat())
 
-                if (ballPosition.value == Offset.Zero) {
-                    ballPosition.value = Offset(
+                if (ballPosition == Offset.Zero) {
+                    ballPosition = Offset(
                         (size.width - ballRadius * 2) / 2f,
                         (size.height - ballRadius * 2) / 2f
                     )
@@ -68,13 +72,15 @@ fun Ball(
                 .padding(top = 30.dp, start = 10.dp, end = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button( onClick = {
+            Button(onClick = {
                 viewModel.startListening()
+                isStopped = false
             }) {
                 Text(text = "Start")
             }
-            Button( onClick = {
+            Button(onClick = {
                 viewModel.stopListening()
+                isStopped = true
             }) {
                 Text(text = "Stop")
             }
@@ -84,8 +90,8 @@ fun Ball(
                 color = Color.Cyan,
                 radius = ballRadius,
                 center = Offset(
-                    ballPosition.value.x + ballRadius,
-                    ballPosition.value.y + ballRadius
+                    ballPosition.x + ballRadius,
+                    ballPosition.y + ballRadius
                 )
             )
         }
